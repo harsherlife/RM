@@ -1,6 +1,7 @@
 use RM::vm::*;
 use RM::path::*;
 use RM::{read_file,errorf};
+use RM::word::*;
 use std::collections::HashMap;
 
 pub fn parse_file(file_name: &str) -> Vec<Instruction>

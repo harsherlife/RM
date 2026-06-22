@@ -7,7 +7,7 @@ macro_rules! String{
 
 
 
-pub fn file_name(name:&str,extension:&str) -> String
+pub fn file_name(name: &str,extension: &str) -> String
 {
     let extens = ".".to_owned() + extension;
     for i in 0..name.len()
