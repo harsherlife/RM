@@ -89,7 +89,11 @@ pub fn read_prog_from_file(file_name: &str) -> Vec<Instruction>
     assert_eq!(file_size % instr_size, 0);
     let num_instrs = file_size / instr_size;
 
-    let mut vec = vec![Instruction::Nop;num_instrs];
+    let mut vec = Vec::with_capacity(num_instrs);
+    for instr in &mut vec 
+    {
+        *instr = Instruction::Nop;
+    }
     let byte_slice = unsafe {
         std::slice::from_raw_parts_mut(
             vec.as_mut_ptr() as *mut u8,
@@ -104,7 +108,7 @@ pub fn read_prog_from_file(file_name: &str) -> Vec<Instruction>
 
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+// #[derive(Copy,Clone)]
 pub enum Instruction
 {
     Nop,
@@ -190,11 +194,11 @@ impl Vm
     }
     fn __exec_instruction(&mut self) -> Fault
     {
-        match self.program[self.program_counter]
+        match &self.program[self.program_counter]
         {
             Instruction::Push{val} =>
             {
-                self.stack.push(val);
+                self.stack.push(val.clone());
                 self.program_counter += 1;
             }
             Instruction::Plus =>
@@ -242,24 +246,24 @@ impl Vm
             }
             Instruction::Dup{val} => 
             {
-                let idx = val as usize;
-                if val < 0{
+                let idx = *val as usize;
+                if *val < 0{
                     return Fault::Underflow;
                 }
                 if idx >= self.stack.len(){
                     return Fault::Overflow;
                 }
-                self.stack.push(self.stack[self.stack.len()-1-idx]);
+                self.stack.push(self.stack[self.stack.len()-1-idx].clone());
                 self.program_counter += 1;
             }
             Instruction::Halt => self.halt = true,
             Instruction::Nop => self.program_counter += 1,
             Instruction::Jmp{val} =>
             {
-                if val as usize >= self.program.len(){
+                if *val as usize >= self.program.len(){
                     return Fault::Bad_Operand("jumping to outside the program");
                 }
-                self.program_counter = val as usize;
+                self.program_counter = *val as usize;
             }
             Instruction::Cmp =>
             {
@@ -281,12 +285,12 @@ impl Vm
             }
             Instruction::JmpIfZero{val} =>
             {
-                if val as usize >= self.program.len(){
+                if *val as usize >= self.program.len(){
                     return Fault::Bad_Operand("jumping to outside the program limits");
                 }
                 let a = pop!(self.stack);
                 if let Word::Int(a) = a && a == 0{
-                    self.program_counter = val;
+                    self.program_counter = *val;
                 }
                 else{
                     self.program_counter += 1;
