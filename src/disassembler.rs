@@ -1,6 +1,5 @@
-use RM::vm::{read_prog_from_file,Instruction};
 use RM::errorf;
-
+use RM::instruction::*;
 
 fn usage()
 {

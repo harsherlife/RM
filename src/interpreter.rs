@@ -1,5 +1,6 @@
 use RM::vm::*;
 use RM::{Vm,errorf};
+use RM::instruction::*;
 
 fn usage()
 {

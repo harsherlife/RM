@@ -1,7 +1,7 @@
-use RM::vm::*;
+use RM::instruction::*;
 use RM::path::*;
-use RM::{read_file,errorf};
 use RM::word::*;
+use RM::{read_file,errorf};
 use std::collections::HashMap;
 
 pub fn parse_file(file_name: &str) -> Vec<Instruction>
@@ -28,7 +28,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             else if buff == "push"
             {
                 buff.clear();
-                while contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -39,7 +39,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             else if buff == "dup"
             {
                 buff.clear();
-                while contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -50,7 +50,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             else if buff == "jmp"
             {
                 buff.clear();
-                while contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -69,7 +69,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             else if buff == "jz"
             {
                 buff.clear();
-                while contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
                 {
                     buff.push(contents[idx]);
                     idx += 1;
