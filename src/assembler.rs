@@ -4,6 +4,11 @@ use RM::word::*;
 use RM::{read_file,errorf};
 use std::collections::HashMap;
 
+pub fn is_space_or_new_line(buff: char) -> bool
+{
+    return buff == ' ' || buff == '\n';
+}
+
 pub fn parse_file(file_name: &str) -> Vec<Instruction>
 {
     let mut vec = Vec::new();
@@ -17,7 +22,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
     {
         if contents[idx] == ' ' || contents[idx] == '\n'
         {
-            while idx < size && (contents[idx] == ' ' || contents[idx] == '\n')
+            while idx < size && is_space_or_new_line(contents[idx])
             {
                 idx += 1;
             }
@@ -25,10 +30,10 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             {
                 continue;
             }
-            else if buff == "push"
+            else if buff == "pushi"
             {
                 buff.clear();
-                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && !is_space_or_new_line(contents[idx])
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -36,10 +41,21 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
                 idx += 1;
                 vec.push(Instruction::Push{val:Word::Int(buff.parse().unwrap())});
             }
+            else if buff == "pushf"
+            {
+                buff.clear();
+                while idx < size && !is_space_or_new_line(contents[idx])
+                {
+                    buff.push(contents[idx]);
+                    idx += 1;
+                }
+                idx += 1;
+                vec.push(Instruction::Push{val:Word::Float(buff.parse().unwrap())});
+            }
             else if buff == "dup"
             {
                 buff.clear();
-                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && !is_space_or_new_line(contents[idx])
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -50,7 +66,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             else if buff == "jmp"
             {
                 buff.clear();
-                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && !is_space_or_new_line(contents[idx])
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -62,14 +78,14 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
                 }
                 else
                 {
-                    unfinished_labels.push((buff.clone(),vec.len()));
+                    unfinished_labels.push((std::mem::take(&mut buff),vec.len()));
                     vec.push(Instruction::Jmp{val:0});
                 }
             }
             else if buff == "jz"
             {
                 buff.clear();
-                while idx < size && contents[idx]!=' ' && contents[idx] != '\n'
+                while idx < size && !is_space_or_new_line(contents[idx])
                 {
                     buff.push(contents[idx]);
                     idx += 1;
@@ -81,7 +97,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
                 }
                 else
                 {
-                    unfinished_labels.push((buff.clone(),vec.len()));
+                    unfinished_labels.push((std::mem::take(&mut buff),vec.len()));
                     vec.push(Instruction::JmpIfZero{val:0});
                 }
             }
@@ -122,7 +138,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
             }
             else if buff.ends_with(':'){
                 buff.pop();
-                labels.insert(buff.clone(),vec.len());
+                labels.insert(std::mem::take(&mut buff),vec.len());
             }
             else {
                 errorf!("Unknown Token {}",buff);
@@ -139,7 +155,7 @@ pub fn parse_file(file_name: &str) -> Vec<Instruction>
     {
         match &mut vec[idx]
         {
-            Instruction::Jmp{val}|Instruction::JmpIfZero{val} => 
+            Instruction::Jmp{val} | Instruction::JmpIfZero{val} => 
             {
                 if labels.contains_key(&name)
                 {

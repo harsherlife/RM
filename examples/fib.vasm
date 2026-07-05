@@ -1,14 +1,15 @@
 # initialize stack
-    push 0
-    push 1
+    pushi 0
+    pushi 1
 begin:
     dup 1
     dup 1
     plus
     dup 0
-    push    1000
+    pushi    1000
     setg
     jz end
     jmp begin # repeat
 end:
+    plus
     halt

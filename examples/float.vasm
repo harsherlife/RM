@@ -1,0 +1,4 @@
+    pushf 20.3
+    pushf 10.2
+    plus
+    halt
